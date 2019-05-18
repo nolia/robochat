@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Robo Chat</string>
+    <string name="next">Next</string>
+    <string name="phone_label">Input your phone number</string>
+    <string name="welcome">Welcome!</string>
+    <string name="code_label">Input security code</string>
+    <string name="logout">Logout</string>
+</resources>
