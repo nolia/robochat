@@ -18,14 +18,14 @@ class MessageServiceManager(private val context: Context) : MessageService {
     private val robots = listOf(
         ChatRobot(1, "Bender", R.drawable.ic_bender) {
             when (it.trim().toLowerCase()) {
-                "Hi", "Hello" -> it
+                "hi", "hello" -> it.trim().toLowerCase()
                 else -> "Kill all humans!"
             }
         },
         ChatRobot(2, "R2D2", R.drawable.ic_r2d2) { "Beep-bee-bee-boop-bee-doo-weep" },
         ChatRobot(3, "Hal9000", R.drawable.ic_hal_9000) {
             when (it.trim().toLowerCase()) {
-                "Hi", "Hello" -> "Good morning, Dave."
+                "hi", "hello" -> "Good morning, Dave."
                 else -> "I am afraid I can't do that Dave."
             }
         }
@@ -44,7 +44,6 @@ class MessageServiceManager(private val context: Context) : MessageService {
             }
 
         }
-            .delay(500, TimeUnit.MILLISECONDS, Schedulers.computation())
     }
 
     override fun getMessages(chatId: Long): Single<List<Message>> = Single.fromCallable {
@@ -59,8 +58,9 @@ class MessageServiceManager(private val context: Context) : MessageService {
         robot.sendMessage(text)
 
         // Send a reply.
-        Completable.fromAction { robot.sendReply() }
-            .delay(Random.nextLong(1000, 1500), TimeUnit.MILLISECONDS, Schedulers.computation())
+        Completable.complete()
+            .delay(Random.nextLong(1000, 2000), TimeUnit.MILLISECONDS, Schedulers.computation())
+            .doOnComplete { robot.sendReply(text) }
             .subscribe()
     }
 }
@@ -91,11 +91,8 @@ private class ChatRobot(
         newMessageChannel.onNext(message)
     }
 
-    fun sendReply() {
-        val lastMessage = messages.lastOrNull() ?: return
-        if (lastMessage.from == name) return
-
-        val reply = onReplyTo(lastMessage.content)
+    fun sendReply(text: String) {
+        val reply = onReplyTo(text)
         if (reply == "") return
 
         sendMessage(reply, name)

@@ -20,7 +20,7 @@ interface MainView : BaseView, WithProgress, WithError {
 
     fun restartSplash()
     fun setChats(chats: List<Chat>)
-    fun openMessages(chatId: Long)
+    fun openMessages(chatId: Long, title: String)
 
 }
 
@@ -28,6 +28,7 @@ class MainPresenter : BasePresenter<MainView>() {
 
     private val authService: AuthService by inject()
     private val messageService: MessageService by inject()
+    private var chatList: List<Chat> = emptyList()
 
     override fun onBind(view: MainView) {
         super.onBind(view)
@@ -39,8 +40,9 @@ class MainPresenter : BasePresenter<MainView>() {
                 },
 
             view.clickChatEvent
-                .subscribe {
-                    view.openMessages(it)
+                .subscribe { id ->
+                    val chat = chatList.firstOrNull { it.id == id } ?: return@subscribe
+                    view.openMessages(id, chat.title)
                 },
 
             // Load messages.
@@ -51,6 +53,7 @@ class MainPresenter : BasePresenter<MainView>() {
                         .observeOn(AndroidSchedulers.mainThread())
                         .withErrorAndProgress()
                 }
+                .doOnNext { chatList = it }
                 .subscribe(view::setChats)
         )
     }

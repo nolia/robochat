@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide
 import com.nolia.robochat.R
 import com.nolia.robochat.base.BaseActivity
 import com.nolia.robochat.domain.Chat
+import com.nolia.robochat.ui.chat.ChatActivity
 import com.nolia.robochat.ui.splash.SplashActivity
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -81,8 +82,8 @@ class MainActivity : BaseActivity(R.layout.activity_main), MainView {
         adapter.chats = chats
     }
 
-    override fun openMessages(chatId: Long) {
-        // Open messages activity
+    override fun openMessages(chatId: Long, title: String) {
+        startActivity(ChatActivity.createIntent(this, chatId, title))
     }
 
     override fun restartSplash() {
