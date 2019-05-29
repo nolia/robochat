@@ -7,6 +7,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.nolia.robochat.di.Injectable
 import io.reactivex.Completable
 import io.reactivex.Maybe
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 
 interface BaseView
@@ -45,6 +46,28 @@ abstract class BasePresenter<View : BaseView> : Injectable, LifecycleObserver {
      *  Call this after `observeOn(mainThread())`.
      */
     protected fun <T> Maybe<T>.withErrorAndProgress(): Maybe<T> {
+        val view = view ?: return this
+
+        var maybe = this
+        if (view is WithProgress) {
+            maybe = maybe
+                .doOnSubscribe { view.showProgress(true) }
+                .doAfterTerminate { view.showProgress(false) }
+
+        }
+
+        if (view is WithError) {
+            maybe = maybe
+                .doOnError { t -> view.showError(t.localizedMessage ?: "Error!") }
+        }
+
+        return maybe
+    }
+
+    /**
+     *  Call this after `observeOn(mainThread())`.
+     */
+    protected fun <T> Single<T>.withErrorAndProgress(): Single<T> {
         val view = view ?: return this
 
         var maybe = this
