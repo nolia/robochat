@@ -24,4 +24,8 @@ class PhoneRobot : BaseRobot() {
         viewIsVisible(R.id.errorTextView)
     }
 
+    fun inputCodeTitleIsShown() {
+        textIsVisible(R.string.code_label)
+    }
+
 }

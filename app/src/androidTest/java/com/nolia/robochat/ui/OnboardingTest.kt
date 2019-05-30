@@ -11,8 +11,8 @@ import com.nolia.robochat.R
 import com.nolia.robochat.di.Injectable
 import com.nolia.robochat.di.inject
 import com.nolia.robochat.fake.TestConfig
+import com.nolia.robochat.robot.login.phone
 import com.nolia.robochat.ui.splash.SplashActivity
-import org.hamcrest.Matchers.not
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,6 +24,7 @@ class OnboardingTest : Injectable {
 
     @Before
     fun setUp() {
+        testConfig.userPhoneNumber = "555-5555"
         ActivityScenario.launch(SplashActivity::class.java)
     }
 
@@ -31,8 +32,6 @@ class OnboardingTest : Injectable {
     fun shouldValidatePhone() {
         val number = "555-5555"
         val errorMessage = "Invalid number!"
-
-        testConfig.userPhoneNumber = number
 
         onView(withId(R.id.phoneEditText))
             .perform(typeText("4939393"))
@@ -51,5 +50,20 @@ class OnboardingTest : Injectable {
         onView(withId(R.id.nextButton)).perform(click())
 
         onView(withText(R.string.code_label)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun robotValidatePhone() {
+        phone {
+            inputPhoneNumber("999999")
+            clickSubmit()
+            errorIsVisible()
+
+            inputPhoneNumber("555-5555")
+            clickSubmit()
+            inputCodeTitleIsShown()
+        }
+
+
     }
 }
